@@ -103,9 +103,9 @@ public class Tweet {
 
       } else {
 
-        if (second <= 10) {
+        if (second <= 5) {
           dateStr.append("Now");
-        } else if (second > 10 && second <= 30) {
+        } else if (second > 5 && second <= 30) {
           dateStr.append("few seconds ago");
         } else if (second > 30 && second <= 60) {
           dateStr.append(second).append("s");

@@ -31,9 +31,9 @@ public class ComposeTweet extends ActionBarActivity {
     int id = item.getItemId();
 
     //noinspection SimplifiableIfStatement
-//    if (id == R.id.send_tweet) {
-//      return true;
-//    }
+    if (id == R.id.send_tweet) {
+      return true;
+    }
 
     return super.onOptionsItemSelected(item);
   }
