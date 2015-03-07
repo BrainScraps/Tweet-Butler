@@ -1,13 +1,22 @@
 package com.codepath.apps.tweetbutler;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
 
 import android.content.Context;
 
+import com.codepath.apps.tweetbutler.models.Tweet;
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /*
  * 
@@ -46,8 +55,27 @@ public class TwitterClient extends OAuthBaseClient {
  public void getHomeTimeline(AsyncHttpResponseHandler handler){
    String apiUrl = getApiUrl("statuses/home_timeline.json");
    RequestParams params = new RequestParams();
-   params.put("count", 25);
+   params.put("count", 30);
    params.put("since_id", 1);
    getClient().get(apiUrl, params, handler);
  }
+//  public ArrayList<Tweet> loadTweets(String oldestTweetId){
+//    ArrayList<Tweet> results = new ArrayList<>();
+//    String apiUrl = getApiUrl("statuses/home_timeline.json");
+//    RequestParams params = new RequestParams();
+//    params.put("count", 30);
+//    params.put("since_id", oldestTweetId);
+//    getClient().get(apiUrl, params, new JsonHttpResponseHandler());
+//  }
+//  public interface OnSuccessfulResponseCallback {
+//    public void onJsonResponse(JSONArray jsonArray);
+//  }
+  public void loadOlderTweets(String tweetId, AsyncHttpResponseHandler handler){
+    ArrayList<Tweet> results = new ArrayList<>();
+    String apiUrl = getApiUrl("statuses/home_timeline.json");
+    RequestParams params = new RequestParams();
+    params.put("count", 12);
+    params.put("max_id", tweetId);
+    getClient().get(apiUrl, params, handler);
+  }
 }

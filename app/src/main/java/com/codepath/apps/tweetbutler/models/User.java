@@ -37,4 +37,8 @@ public class User {
     }
     return u;
   }
+
+  public CharSequence getScreenNameForDisplay() {
+    return "@" + getScreenName();
+  }
 }

@@ -53,6 +53,14 @@
             android:name=".TimelineActivity"
             android:label="@string/title_activity_timeline" >
         </activity>
+        <activity
+            android:name=".ComposeTweet"
+            android:label="@string/title_activity_compose_tweet"
+            android:parentActivityName=".TimelineActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.codepath.apps.tweetbutler.TimelineActivity" />
+        </activity>
     </application>
 
 </manifest>

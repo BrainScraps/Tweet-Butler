@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="8dp"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#ffffffff">
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="5dp"
+        android:id="@+id/ivProfile"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="\@handle"
+        android:id="@+id/tvHandle"
+        android:layout_alignBaseline="@+id/tvDisplayName"
+        android:layout_alignBottom="@+id/tvDisplayName"
+        android:layout_toRightOf="@+id/tvDisplayName"
+        android:layout_toEndOf="@+id/tvDisplayName"
+        android:layout_marginLeft="4dp"
+        android:textColor="#ff828282"
+        android:fontFamily="sans-serif-light"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Twitter talk"
+        android:id="@+id/tvText"
+        android:layout_toRightOf="@+id/ivProfile"
+        android:layout_below="@+id/tvDisplayName"
+        android:autoLink="all"
+        android:linksClickable="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Person Name"
+        android:id="@+id/tvDisplayName"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/ivProfile"
+        android:layout_toEndOf="@+id/ivProfile"
+        android:textStyle="bold"
+        android:textColor="#ff000000"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="22m"
+        android:id="@+id/tvRelativeTime"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+</RelativeLayout>
