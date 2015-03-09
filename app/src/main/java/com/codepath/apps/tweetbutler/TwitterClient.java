@@ -1,7 +1,6 @@
 package com.codepath.apps.tweetbutler;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.builder.api.Api;
@@ -9,9 +8,8 @@ import org.scribe.builder.api.TwitterApi;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.widget.Toast;
+import android.util.Log;
 
-import com.activeandroid.util.Log;
 import com.codepath.apps.tweetbutler.models.Tweet;
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -19,7 +17,6 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /*
  * 
@@ -41,7 +38,8 @@ public class TwitterClient extends OAuthBaseClient {
   public static final String REST_CALLBACK_URL = "oauth://tweetbutlerpro"; // Change this (here and in manifest)
   private SharedPreferences preferences;
   private SharedPreferences.Editor editor;
-  private UserProfileLoaderListener listener;
+  private ProfilePictureUrlLoaderListener pictureListener;
+  private UserProfileLoaderListener userListener;
 
   public TwitterClient(Context context) {
     super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -86,7 +84,7 @@ public class TwitterClient extends OAuthBaseClient {
   }
 
   public void userProfile(final UserProfileLoaderListener listener){
-    this.listener = listener;
+    this.userListener = listener;
 
     String apiUrl = getApiUrl("account/settings.json");
     getClient().get(apiUrl, new JsonHttpResponseHandler(){
@@ -101,12 +99,48 @@ public class TwitterClient extends OAuthBaseClient {
 
       @Override
       public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+        Log.d("Failure in userProfile", "sad");
       };
 
     });
   }
 
+  public void profilePicture(String screenName, final ProfilePictureUrlLoaderListener listener){
+    this.pictureListener = listener;
+    String apiUrl = getApiUrl("users/show.json");
+    RequestParams params = new RequestParams();
+    params.put("screen_name", screenName);
+
+    getClient().get(apiUrl, params, new JsonHttpResponseHandler(){
+      @Override
+      public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+        try {
+          listener.onProfilePictureUrlLoaded(response.getString("profile_image_url"), response.getString("name"));
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+      }
+
+      @Override
+      public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+        Log.d("Failure in", "profilePicture");
+      };
+
+    });
+  }
+
+  public void postTweet(String tweetText, JsonHttpResponseHandler jsonHttpResponseHandler) {
+    String apiUrl = getApiUrl("statuses/update.json");
+    RequestParams params = new RequestParams();
+    params.put("status", tweetText);
+    getClient().post(apiUrl, params, jsonHttpResponseHandler);
+  }
+
   public static interface UserProfileLoaderListener{
     public void onProfileLoaded(String screenName);
+  }
+
+  public static interface ProfilePictureUrlLoaderListener {
+    public void onProfilePictureUrlLoaded(String url, String name);
   }
 }

@@ -10,5 +10,8 @@
     <string name="compose_tweet">Compose</string>
     <string name="title_activity_compose_tweet">Compose Tweet</string>
     <string name="send_tweet">Tweet</string>
+    <string name="screen_name">\@twitterUser</string>
+    <string name="full_name">Twitter User</string>
+    <string name="tweet_hint">What\'s happening?</string>
 
 </resources>

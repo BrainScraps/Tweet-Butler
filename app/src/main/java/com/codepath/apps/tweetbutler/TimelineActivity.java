@@ -13,12 +13,10 @@ import com.activeandroid.util.Log;
 import com.codepath.apps.tweetbutler.adapters.EndlessScrollListener;
 import com.codepath.apps.tweetbutler.adapters.TweetsArrayAdapter;
 import com.codepath.apps.tweetbutler.models.Tweet;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -49,31 +47,10 @@ public class TimelineActivity extends ActionBarActivity {
     });
     client = TwitterApplication.getRestClient();
     populateTimeline();
-    storeUsername();
-//    String userProfile = getUserProfile();
+    if (usernameNotInPreferences()){
+      storeUsername();
+    }
   }
-
-//  private String getUserProfile() {
-//    String returnString = "";
-//    client.userProfile(new JsonHttpResponseHandler() {
-//      @Override
-//      public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-//        Log.d("DEBUG", response.toString());
-//        try{
-//          returnString = response.getString("screen_name");
-//        } catch(JSONException e){
-//          e.printStackTrace();
-//        }
-//      }
-//
-//      @Override
-//      public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//        Toast.makeText(getApplicationContext(), "Problem retrieving tweets :/", Toast.LENGTH_SHORT).show();
-//        Log.d("DEBUG", errorResponse.toString());
-//      }
-//
-//    });
-//  }
 
   private void storeUsername(){
      client.userProfile( new TwitterClient.UserProfileLoaderListener(){
@@ -83,18 +60,27 @@ public class TimelineActivity extends ActionBarActivity {
        SharedPreferences preferences = getSharedPreferences("TweetButler", MODE_PRIVATE);
        SharedPreferences.Editor editor = preferences.edit();
        editor.putString("screenName", screenName);
-       Toast.makeText(getApplicationContext(), screenName, Toast.LENGTH_LONG).show();
        editor.apply();
+//       preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+//         @Override
+//         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+//
+//         }
+//       });
      }
    });
+  }
+
+  private boolean usernameNotInPreferences(){
+    SharedPreferences pref = getSharedPreferences("TweetButler", MODE_PRIVATE);
+    return pref.getString("screenName", "").equals("");
   }
 
   private void populateTimeline(){
     client.getHomeTimeline(new JsonHttpResponseHandler() {
       @Override
       public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-        Log.d("DEBUG", response.toString());
-
+        aTweets.clear();
         aTweets.addAll(Tweet.fromJSONArray(response));
       }
 
@@ -146,5 +132,30 @@ public class TimelineActivity extends ActionBarActivity {
     }
 
     return super.onOptionsItemSelected(item);
+  }
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if(requestCode == COMPOSE_TWEET_CODE && resultCode == RESULT_OK) {
+      postTweet(data.getStringExtra("tweetText"));
+    }
+    super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  private void postTweet(String tweetText){
+    client.postTweet( tweetText, new JsonHttpResponseHandler() {
+      @Override
+      public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+        Toast.makeText(getApplicationContext(), "Tweet sent", Toast.LENGTH_SHORT).show();
+        populateTimeline();
+      }
+
+      @Override
+      public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+        Toast.makeText(getApplicationContext(), "Problem sending tweet", Toast.LENGTH_SHORT).show();
+        Log.d("DEBUG", responseString);
+      }
+
+    });
+
   }
 }
