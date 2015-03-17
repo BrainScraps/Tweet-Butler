@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.activeandroid.util.Log;
+import com.astuetz.PagerSlidingTabStrip;
 import com.codepath.apps.tweetbutler.adapters.TweetsArrayAdapter;
 import com.codepath.apps.tweetbutler.fragments.HomeTimelineFragment;
 import com.codepath.apps.tweetbutler.fragments.UserMentionsFragment;
@@ -33,6 +36,7 @@ public class TimelineActivity extends ActionBarActivity {
   private TweetsArrayAdapter aTweets;
   private ListView lvTweets;
   private UserMentionsFragment fragmentTweetList;
+  private SharedPreferences pref;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -42,35 +46,37 @@ public class TimelineActivity extends ActionBarActivity {
     if (usernameNotInPreferences()){
       storeUsername();
     }
-    if (savedInstanceState == null){
-      fragmentTweetList = (UserMentionsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
-    }
+
+    ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+    viewPager.setAdapter(new TweetsPagerAdapter(getSupportFragmentManager()));
+    PagerSlidingTabStrip tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+    tabStrip.setViewPager(viewPager);
 
   }
 
   private void storeUsername(){
-     client.userProfile( new TwitterClient.UserProfileLoaderListener(){
+    client.userProfile( new TwitterClient.UserProfileLoaderListener(){
 
-     @Override
-     public void onProfileLoaded(String screenName, String profileImageUrl, String backgroundImageUrl) {
-       SharedPreferences preferences = getSharedPreferences("TweetButler", MODE_PRIVATE);
-       SharedPreferences.Editor editor = preferences.edit();
-       editor.putString("screenName", screenName);
-       editor.putString("profileImageUrl", profileImageUrl);
-       editor.putString("backgroundImageUrl", backgroundImageUrl);
-       editor.apply();
+      @Override
+      public void onProfileLoaded(String screenName, String profileImageUrl, String backgroundImageUrl) {
+        SharedPreferences preferences = getSharedPreferences("TweetButler", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("screenName", screenName);
+        editor.putString("profileImageUrl", profileImageUrl);
+        editor.putString("backgroundImageUrl", backgroundImageUrl);
+        editor.apply();
 //       preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
 //         @Override
 //         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 //
 //         }
 //       });
-     }
-   });
+      }
+    });
   }
 
   private boolean usernameNotInPreferences(){
-    SharedPreferences pref = getSharedPreferences("TweetButler", MODE_PRIVATE);
+    pref = getSharedPreferences("TweetButler", MODE_PRIVATE);
     return pref.getString("screenName", "").equals("");
   }
 
@@ -94,6 +100,15 @@ public class TimelineActivity extends ActionBarActivity {
     if (id == R.id.compose_tweet) {
       Intent i = new Intent(this, ComposeTweet.class);
       startActivityForResult(i, COMPOSE_TWEET_CODE);
+      return true;
+    }
+
+    if (id == R.id.user_profile) {
+      Intent i = new Intent(this, UserProfileActivity.class);
+      SharedPreferences pref = getSharedPreferences("TweetButler", MODE_PRIVATE);
+      String screenname  = pref.getString("screenName", "");
+      i.putExtra("user", screenname);
+      startActivity(i);
       return true;
     }
 
@@ -123,26 +138,34 @@ public class TimelineActivity extends ActionBarActivity {
 
     });
 
-    class TweetsPagerAdapter extends FragmentPagerAdapter{
-      public String tabTitles[] = {"Home", "Mentions"};
 
-      public TweetsPagerAdapter(FragmentManager fm){
-        super(fm);
-      }
+  }
+  public class TweetsPagerAdapter extends FragmentPagerAdapter {
+    public String tabTitles[] = {"Home", "Mentions"};
 
-      @Override
-      public Fragment getItem(int position) {
-        if (position == 0 ){
-          return new HomeTimelineFragment();
-        } else {
-          return new UserMentionsFragment();
-        }
-      }
+    public TweetsPagerAdapter(FragmentManager fm){
+      super(fm);
+    }
 
-      @Override
-      public int getCount() {
-        return tabTitles.length;
+    @Override
+    public Fragment getItem(int position) {
+      if (position == 0 ){
+        return new HomeTimelineFragment();
+      } else if (position == 1){
+        return new UserMentionsFragment();
+      } else {
+        return null;
       }
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+      return tabTitles[position];
+    }
+
+    @Override
+    public int getCount() {
+      return tabTitles.length;
     }
   }
 }
