@@ -1,6 +1,7 @@
 package com.codepath.apps.tweetbutler.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,12 +9,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codepath.apps.tweetbutler.R;
 import com.codepath.apps.tweetbutler.TwitterApplication;
 import com.codepath.apps.tweetbutler.TwitterClient;
+import com.codepath.apps.tweetbutler.UserProfileActivity;
 import com.codepath.apps.tweetbutler.adapters.EndlessScrollListener;
 import com.codepath.apps.tweetbutler.adapters.TweetsArrayAdapter;
 import com.codepath.apps.tweetbutler.models.Tweet;
@@ -55,6 +58,17 @@ public class UserMentionsFragment extends TweetsListFragment{
         addOlderTweets(totalItemsCount);
       }
     });
+    lvTweets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent i = new Intent(getActivity(), UserProfileActivity.class);
+        Tweet tweet = tweets.get(position);
+        i.putExtra("user", tweet.getUser().getScreenName());
+        startActivity(i);
+      }
+    });
+
+
 
     return v;
   }
@@ -79,7 +93,7 @@ public class UserMentionsFragment extends TweetsListFragment{
   public void addOlderTweets(int totalItemsCount){
     Tweet lastTweet = (Tweet) aTweets.getItem((totalItemsCount - 1));
     String uid = String.valueOf(lastTweet.getUid());
-    client.loadOlderMentions(uid, new JsonHttpResponseHandler(){
+    client.loadOlderMentions(uid, new JsonHttpResponseHandler() {
       @Override
       public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
         aTweets.addAll(Tweet.fromJSONArray(response));

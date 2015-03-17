@@ -165,7 +165,6 @@ public class TwitterClient extends OAuthBaseClient {
     String apiUrl = getApiUrl("users/show.json");
     RequestParams params = new RequestParams();
 
-    Toast.makeText(context, userName, Toast.LENGTH_SHORT).show();
     params.put("screen_name", userName);
 
 

@@ -1,17 +1,20 @@
 package com.codepath.apps.tweetbutler.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codepath.apps.tweetbutler.R;
 import com.codepath.apps.tweetbutler.TwitterApplication;
 import com.codepath.apps.tweetbutler.TwitterClient;
+import com.codepath.apps.tweetbutler.UserProfileActivity;
 import com.codepath.apps.tweetbutler.adapters.EndlessScrollListener;
 import com.codepath.apps.tweetbutler.adapters.TweetsArrayAdapter;
 import com.codepath.apps.tweetbutler.models.Tweet;
@@ -49,6 +52,15 @@ public class HomeTimelineFragment extends TweetsListFragment{
       public void onLoadMore(int page, int totalItemsCount) {
         Log.d("oldertweets", String.valueOf(totalItemsCount));
         addOlderTweets(totalItemsCount);
+      }
+    });
+    lvTweets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent i = new Intent(getActivity(), UserProfileActivity.class);
+        Tweet tweet = tweets.get(position);
+        i.putExtra("user", tweet.getUser().getScreenName());
+        startActivity(i);
       }
     });
 

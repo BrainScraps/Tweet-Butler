@@ -1,5 +1,6 @@
 package com.codepath.apps.tweetbutler.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -15,9 +17,11 @@ import android.widget.Toast;
 import com.codepath.apps.tweetbutler.R;
 import com.codepath.apps.tweetbutler.TwitterApplication;
 import com.codepath.apps.tweetbutler.TwitterClient;
+import com.codepath.apps.tweetbutler.UserProfileActivity;
 import com.codepath.apps.tweetbutler.adapters.EndlessScrollListener;
 import com.codepath.apps.tweetbutler.adapters.TweetsArrayAdapter;
 import com.codepath.apps.tweetbutler.models.Tweet;
+import com.codepath.apps.tweetbutler.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
@@ -37,6 +41,15 @@ public class TweetsListFragment extends Fragment{
     View v = inflater.inflate(R.layout.fragment_tweets_list, container, false);
     lvTweets = (ListView) v.findViewById(R.id.lvTweets);
     lvTweets.setAdapter(aTweets);
+    lvTweets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent i = new Intent(getActivity(), UserProfileActivity.class);
+        Tweet tweet = tweets.get(position);
+        i.putExtra("user", tweet.getUser().getScreenName());
+        startActivity(i);
+      }
+    });
     return v;
 
   }
