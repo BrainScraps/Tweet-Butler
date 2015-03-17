@@ -1,0 +1,108 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.codepath.apps.tweetbutler.UserProfileActivity">
+
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="185dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/profileHeader"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:id="@+id/headerProfileImage"
+            android:layout_marginLeft="21dp"
+            android:layout_marginStart="21dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Full Name"
+            android:id="@+id/headerFullName"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/headerProfileImage"
+            android:layout_toEndOf="@+id/headerProfileImage"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="30dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\@user"
+            android:id="@+id/headerScreenName"
+            android:layout_alignTop="@+id/headerFullName"
+            android:layout_toRightOf="@+id/headerFullName"
+            android:layout_toEndOf="@+id/headerFullName"
+            android:layout_marginLeft="33dp"
+            android:layout_marginStart="33dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bio Text"
+            android:id="@+id/twitterBio"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/headerProfileImage"
+            android:layout_toEndOf="@+id/headerProfileImage"
+            android:layout_marginLeft="30dp"
+            android:layout_marginStart="27dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Followers"
+            android:id="@+id/tvFollowersLabel"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/headerProfileImage"
+            android:layout_alignRight="@+id/twitterBio"
+            android:layout_alignEnd="@+id/tvFollowersNum"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:id="@+id/tvFollowersNum"
+            android:layout_alignTop="@+id/tvFollowersLabel"
+            android:layout_toRightOf="@+id/headerProfileImage"
+            android:layout_toEndOf="@+id/headerProfileImage"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:id="@+id/tvFollowingCount"
+            android:layout_alignBottom="@+id/tvFollowersLabel"
+            android:layout_alignLeft="@+id/headerScreenName"
+            android:layout_alignStart="@+id/headerScreenName"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Following"
+            android:id="@+id/tvFollowingLabel"
+            android:layout_alignTop="@+id/tvFollowingCount"
+            android:layout_toRightOf="@+id/tvFollowingCount"
+            android:layout_toEndOf="@+id/tvFollowingCount"
+            android:layout_marginLeft="12dp"/>
+    </RelativeLayout>
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/profileHeader"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/flUserTimeline">
+    </FrameLayout>
+</RelativeLayout>

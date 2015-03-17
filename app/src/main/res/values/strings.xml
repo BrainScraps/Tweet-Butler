@@ -13,5 +13,7 @@
     <string name="screen_name">\@twitterUser</string>
     <string name="full_name">Twitter User</string>
     <string name="tweet_hint">What\'s happening?</string>
+    <string name="profile">Profile</string>
+    <string name="title_activity_user_profile">UserProfileActivity</string>
 
 </resources>

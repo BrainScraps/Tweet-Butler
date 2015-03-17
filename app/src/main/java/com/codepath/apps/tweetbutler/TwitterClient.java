@@ -9,6 +9,7 @@ import org.scribe.builder.api.TwitterApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.codepath.apps.tweetbutler.models.Tweet;
 import com.codepath.oauth.OAuthBaseClient;
@@ -33,13 +34,12 @@ import java.util.ArrayList;
 public class TwitterClient extends OAuthBaseClient {
   public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
   public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
-  public static final String REST_CONSUMER_KEY = "";       // Change this
-  public static final String REST_CONSUMER_SECRET = ""; // Change this
   public static final String REST_CALLBACK_URL = "oauth://tweetbutlerpro"; // Change this (here and in manifest)
   private SharedPreferences preferences;
   private SharedPreferences.Editor editor;
   private ProfilePictureUrlLoaderListener pictureListener;
   private UserProfileLoaderListener userListener;
+  private UserShowLoaderListener userShowListener;
 
   public TwitterClient(Context context) {
     super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
@@ -63,6 +63,13 @@ public class TwitterClient extends OAuthBaseClient {
     params.put("since_id", 1);
     getClient().get(apiUrl, params, handler);
   }
+
+  public void getUserMentions( String username, JsonHttpResponseHandler handler){
+    String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+    RequestParams params = new RequestParams();
+    params.put("count", 30);
+    getClient().get(apiUrl, params, handler);
+  }
   //  public ArrayList<Tweet> loadTweets(String oldestTweetId){
 //    ArrayList<Tweet> results = new ArrayList<>();
 //    String apiUrl = getApiUrl("statuses/home_timeline.json");
@@ -75,7 +82,6 @@ public class TwitterClient extends OAuthBaseClient {
 //    public void onJsonResponse(JSONArray jsonArray);
 //  }
   public void loadOlderTweets(String tweetId, AsyncHttpResponseHandler handler){
-    ArrayList<Tweet> results = new ArrayList<>();
     String apiUrl = getApiUrl("statuses/home_timeline.json");
     RequestParams params = new RequestParams();
     params.put("count", 12);
@@ -86,12 +92,18 @@ public class TwitterClient extends OAuthBaseClient {
   public void userProfile(final UserProfileLoaderListener listener){
     this.userListener = listener;
 
-    String apiUrl = getApiUrl("account/settings.json");
-    getClient().get(apiUrl, new JsonHttpResponseHandler(){
+    String apiUrl = getApiUrl("account/verify_credentials.json");
+    RequestParams params = new RequestParams();
+    params.put("skip_status", "1");
+
+    getClient().get(apiUrl, new JsonHttpResponseHandler() {
       @Override
       public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
         try {
-          listener.onProfileLoaded(response.getString("screen_name"));
+          String screenName = response.getString("screen_name");
+          String profileImageUrl = response.getString("profile_image_url");
+          String backgroundImageUrl = response.getString("background_image_url");
+          listener.onProfileLoaded(screenName, profileImageUrl, backgroundImageUrl);
         } catch (JSONException e) {
           e.printStackTrace();
         }
@@ -100,7 +112,9 @@ public class TwitterClient extends OAuthBaseClient {
       @Override
       public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
         Log.d("Failure in userProfile", "sad");
-      };
+      }
+
+      ;
 
     });
   }
@@ -136,11 +150,66 @@ public class TwitterClient extends OAuthBaseClient {
     getClient().post(apiUrl, params, jsonHttpResponseHandler);
   }
 
+  public void loadOlderMentions(String tweetId, JsonHttpResponseHandler handler) {
+    String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+    RequestParams params = new RequestParams();
+    params.put("count", 12);
+    params.put("max_id", tweetId);
+    getClient().get(apiUrl, params, handler);
+
+  }
+
+  public void getUserObject(String userName, final UserShowLoaderListener listener) {
+    this.userShowListener = listener;
+
+    String apiUrl = getApiUrl("users/show.json");
+    RequestParams params = new RequestParams();
+
+    params.put("screen_name", userName);
+
+
+    getClient().get(apiUrl, params, new JsonHttpResponseHandler() {
+      @Override
+      public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+          listener.onProfileLoaded(response);
+      }
+
+      @Override
+      public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+        Toast.makeText(context, "Problem loading profile", Toast.LENGTH_SHORT).show();
+        Log.d("Failure in userProfile", "sad");
+      }
+
+    });
+
+  }
+
+  public void getUserTimeline(String twitterUsername, JsonHttpResponseHandler handler) {
+    String apiUrl = getApiUrl("statuses/user_timeline.json");
+    RequestParams params = new RequestParams();
+    params.put("screen_name", twitterUsername);
+    params.put("count", 30);
+    getClient().get(apiUrl, params, handler);
+  }
+
+  public void loadOlderTimelineTweets(String screenName, String uid, JsonHttpResponseHandler handler) {
+    String apiUrl = getApiUrl("statuses/user_timeline.json");
+    RequestParams params = new RequestParams();
+    params.put("count", 12);
+    params.put("max_id", uid);
+    params.put("screen_name", screenName);
+    getClient().get(apiUrl, params, handler);
+  }
+
   public static interface UserProfileLoaderListener{
-    public void onProfileLoaded(String screenName);
+    public void onProfileLoaded(String screenName, String profileImageUrl, String profileBackgroundImageUrl);
   }
 
   public static interface ProfilePictureUrlLoaderListener {
     public void onProfilePictureUrlLoaded(String url, String name);
+  }
+
+  public static interface UserShowLoaderListener{
+    public void onProfileLoaded(JSONObject jsonObject);
   }
 }
